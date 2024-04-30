@@ -1,3 +1,6 @@
-Book/
-Code/
-Docs/
+[Bb]ook/
+[Cc]ode/
+[Dd]ocs/
+
+
+*.log
