@@ -1,3 +1,9 @@
+## STC90C516
+
+
+
+
+
 ## Raspberry
 
 ### Start
@@ -697,7 +703,6 @@ AT+CIPAP?
 <img src=".\Images\TPYBoardV102\NRF24L01_02.png" />
 
 ```json
-
 1 GND ------>> 接地(与单片机共地)
 2 VCC ------>> 1.9~3.6V (推荐3.3V)
 3 CE ------>> RX 或 TX模式选择 高电平>10us则为发送模式 持续高电平为接收模式
@@ -709,6 +714,7 @@ AT+CIPAP?
 
 http://bbs.eeworld.com.cn/thread-644156-1-1.html
 https://blog.csdn.net/Kevin_8_Lee/article/details/95667604
+
 NRF24L01	
 VCC		CSN		MOSI	IRQ
 
@@ -724,9 +730,33 @@ GND		X4		X6		X7
 VCC		Y5		Y8		-
 
 GND		Y4		Y6		X7
+
+红	    灰	   橙	   -
+
+黑	    土	   黄	   橙
+
+```
+
+> USB 串口指令
+
+```
+无线接收本机地址
+AT+RXA=0xA5,0xA5,0xA5,0xA5,0xA5
+
+无线发送目标地址
+AT+TXA=0xA5,0xA5,0xA5,0xA5,0xA5
+
+无线通讯信道设置
+AT+FREQ=2.xxxxG
+信道 2.xxx为要设定的频率,范围是2.400CHz~2.525GHz,超过范围无效。
+
+参数信息查询
+AT?
 ```
 
 
+
+底层时序图
 
 
 
