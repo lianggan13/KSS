@@ -95,10 +95,6 @@ ex: docker run -it --privileged=true -v /mydocker/u:/tmp/u --name u1 ubuntu /bin
 "registry-mirrors":["https://jgnv1bqb.mirror.aliyuncs.com"],
 ```
 
-
-
-
-
 ### Ubuntu
 
 ```c#
@@ -157,14 +153,159 @@ sudo service docker start
 控制台>>容器镜像服务>> 镜像工具 镜像加速器
 ```
 
-### MongoDB
+### KyLin
+
+> 离线安装.NET环境 
+
+```
+下载离线安装包 https://dotnet.microsoft.com/en-us/download/dotnet/6.0
+Linux X64
+dotnet-sdk-6.0.425-linux-x64.tar.gz
+
+复制
+复制到如下目录：
+/usr/local/dotnet/dotnet-sdk-6.0.425-linux-x64.tar.gz
+
+解压
+cd /usr/local/dotnet/
+tar -zxvf dotnet-sdk-6.0.425-linux-x64.tar.gz
+
+创建软链接
+ln -s /usr/local/dotnet/dotnet /bin
+
+编辑 /etc/profile 文件
+vim /etc/profile
+添加如下内容：
+export PATH=$PATH:/usr/local/dotnet
+export DOTNET_ROOT=/usr/local/dotnet
+
+使立即生效：
+source /etc/profile
+```
+
+> 安装 Docker
+
+```json
+参考链接：https://juejin.cn/post/7349189143799611419
+
+https://download.docker.com/linux/static/stable/x86_64/
+docker-27.2.0.tgz 
+
+下载安装包
+wget https://download.docker.com/linux/static/stable/x86_64/docker-27.2.0.tgz 
+解压
+tar -zxvf docker-27.2.0.tgz
+移动解压出来的二进制文件到 /usr/bin 目录中
+mv docker/* /usr/bin/
+
+配置添加 systemd
+编辑docker的系统服务文件
+vi /usr/lib/systemd/system/docker.service
+[Unit]
+Description=Docker Application Container Engine
+Documentation=https://docs.docker.com
+After=network-online.target firewalld.service
+Wants=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/dockerd
+ExecReload=/bin/kill -s HUP $MAINPID
+LimitNOFILE=infinity
+LimitNPROC=infinity
+TimeoutStartSec=0
+Delegate=yes
+KillMode=process
+Restart=on-failure
+StartLimitBurst=3
+StartLimitInterval=60s
+[Install]
+WantedBy=multi-user.target
+
+创建docker配置文件
+mkdir -p /etc/docker
+vim /etc/docker/daemon.json
+
+{
+  "registry-mirrors": [
+     "https://bxsfpjcb.mirror.aliyuncs.com"
+  ],
+  "max-concurrent-downloads": 10,
+  "log-driver": "json-file",
+  "log-level": "warn",
+  "log-opts": {
+    "max-size": "50m",
+    "max-file": "1"
+    },
+  "insecure-registries":
+        ["127.0.0.1"],
+  "data-root":"/var/lib/docker"
+}
+
+重新加载和重启docker
+systemctl daemon-reload
+systemctl restart docker
+
+docker --version
+
+配置镜像加速器
+https://gist.github.com/y0ngb1n/7e8f16af3242c7815e7ca2f0833d3ea6
+
+{
+  "registry-mirrors": [
+	"https://docker.m.daocloud.io",
+	"https://dockerhub.azk8s.cn",
+	"https://docker.mirrors.ustc.edu.cn"
+	],
+  "exec-opts": ["native.cgroupdriver=systemd"]
+}
+
+```
+
+> Net6.0
 
 ```c#
+dotnet ASIS.Server.dll --urls=http://*:5000
+
+
+ var host = _httpContextAccessor.HttpContext.Request.Host;
+ var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
+```
+
+
+
+### MongoDB
+
+```json
+https://blog.csdn.net/packge/article/details/126539320
+
+
+docker-compose.yml
+https://blog.csdn.net/weixin_41352552/article/details/130283018
+
+
+docker pull mongodb/mongodb-community-server:latest
+docker run --name mongodb -p 27017:27017 -d mongodb/mongodb-community-server:latest
+    
+
+docker pull mongo:4.4
+docker pull mongo:latest
+docker run -d -p 27017:27017 --name mymongo mongo
+
 docker run -it -p 27016:27017 --ip 0.0.0.0 --name mymongo --rm mongo
 
 docker run -it -p 27016:27017 -v C:/Users/67602/Desktop/mongo/data/configdb:/data/configdb -v C:/Users/67602/Desktop/mongo/data/db:/data/db --ip 0.0.0.0 --name mymongo --rm mongo
 
+docker run -it -p 27017:27017 -v /root/docker/docker_volume/mongodb/data/configdb:/data/configdb -v /root/docker/docker_volume/mongodb/data/db:/data/db --ip 0.0.0.0 --name mymongo --rm mongo
+
 docker exec -it mymongo mongosh
+    
+关闭防火墙
+# centos 麒麟
+firewall-cmd --zone=public --add-port=27017/tcp --permanent  && firewall-cmd --reload
+# ubantu
+sudo ufw allow 27017
+
 
 ```
 

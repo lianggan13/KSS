@@ -1,8 +1,22 @@
 ## STC90C516
 
+Keil
 
+![](Images\C51\Keil_Output.png)
 
+### I2C
 
+![](Images\C51\I2C_时序图.png)
+
+## STM32103C8T6
+
+![](Images\STM32\STM32103C8T6.png)
+
+### NRF2401L
+
+![](Images\STM32\NRF2401L 接线图.png)
+
+![](Images\STM32\NRF2401L 配置.png)
 
 ## Raspberry
 
@@ -720,6 +734,18 @@ VCC		CSN		MOSI	IRQ
 
 GND		CE		SCK		MISO
 
+-----------------------------
+STM32F10X
+
+VCC		10		15(PC6)	15?
+
+GND		5(PC5)	13		14(PC7)
+
+红	    灰	   橙	   -
+
+黑	    土	   黄	   橙
+
+-----------------------------
 TPYBoardv10x
 
 VCC		X5		X8		-
@@ -735,16 +761,18 @@ GND		Y4		Y6		X7
 
 黑	    土	   黄	   橙
 
+
+
 ```
 
 > USB 串口指令
 
 ```
 无线接收本机地址
-AT+RXA=0xA5,0xA5,0xA5,0xA5,0xA5
+AT+RXA=0xFF,0xFF,0xFF,0xFF,0xFF
 
 无线发送目标地址
-AT+TXA=0xA5,0xA5,0xA5,0xA5,0xA5
+AT+TXA=0xFF,0xFF,0xFF,0xFF,0xFF
 
 无线通讯信道设置
 AT+FREQ=2.xxxxG
