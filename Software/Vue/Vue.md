@@ -521,3 +521,40 @@ export default {
 监视属性适用于对数据变化时执行一些自定义的逻辑，更具灵活性，可以处理异步操作或复杂的业务逻辑。
 在大多数情况下，使用计算属性更简洁和直观，而使用监视属性则更适合处理一些需要监听变化并执行特定操作的场景。
 
+### Json 序列化&反序列化
+
+```js
+class Camera {
+  id!: number;
+  name!: string;
+  ip!: string;
+  port!: number;
+  user!: string | null;
+  password!: string | null;
+
+  action!: string | null;
+  width!: string | null;
+  height!: string | null;
+}
+
+class Message {
+  action!: string;
+  data!: object | null;
+}
+
+const json = `{"action": "login","data": {"id": ${id}, "name": "HIK NVR", "ip": "10.60.0.5", "port": 80, "user": "admin", "password": "yunda123"}}`;
+
+const message = JSON.parse(json) as Message;
+const action = message.action.toLowerCase();
+const data = message.data;
+
+var cam = reactive(data!) as Camera;
+
+```
+
+
+
+
+
+
+
