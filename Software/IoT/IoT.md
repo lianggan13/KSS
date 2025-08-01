@@ -85,42 +85,72 @@ syntax on  #语法高亮
 set tabstop=4  #tab退四格
 ```
 
-### VsCode Rmote 
+### Deploy
 
-Keys: VsCode、SSH、Python
+Keys:deploy、SSH、.Net
 
-```markdown
-1.Visual Stuido Code & FinalShell
+[将 .NET 应用部署到 ARM 单板计算机 - .NET | Microsoft Learn](https://learn.microsoft.com/zh-cn/dotnet/iot/deployment)
 
-2.Windows10 设置开发人员模式,安装 OpenSSH
+使用 [dotnet-install 脚本](https://learn.microsoft.com/zh-cn/dotnet/core/tools/dotnet-install-script)在设备上安装 .NET 8.0
 
-3.Install Remote - SSH & Remote - SSH: Editing Configuration Files on vs code
-  configure ssh path: C:\Windows\System32\OpenSSH\ssh.exe
+```sh
+pi: curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0
+    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0 --runtime aspnetcore
+    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 9.0
+    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 9.0 --runtime aspnetcore
 
-4.Run powershell cmd on windows: ssh-keygen -t rsa -b 4096
- (tip: C:\Users\lianggan13/.ssh/id_rsa)
- 
-5.Run cmds on linux:
-	ssh-keygen -t rsa -b 4096
-	
-6.Copy id_rsa.pub from windows to linux
+echo 'export DOTNET_ROOT=$HOME/.dotnet' >> ~/.bashrc
+echo 'export PATH=$PATH:$HOME/.dotnet' >> ~/.bashrc
+echo 'export PATH=$HOME/.dotnet:$PATH' >> ~/.bashrc
+source ~/.bashrc
 
-7.Run cmds on linux:
-	cat .ssh/id_rsa.pub >> .ssh/authorized_keys
-	sudo chmod 777 .ssh/authorized_keys
-	sudo chmod 700 -R .ssh
+dotnet --list-runtimes
+dotnet --version
+dotnet --info
 
-8.sudo vi /etc/ssh/sshd_config
+pc: 
+    dotnet publish -c debug -r linux-arm --self-contained false
+    dotnet publish -c runtime -r linux-arm --self-contained false
+    dotnet publish -c Release -r linux-arm --self-contained false
+
+pc: scp -r ./bin/Release/net8.0/linux-arm64/publish/* pi@raspberrypi:/home/pi/smartled/
+
+pi: dotnet SmartLEDApi.dll --environment Development --urls "http://0.0.0.0:5000"
+
+(arm64)
+dotnet publish -c debug -r linux-arm64 --self-contained false
+dotnet publish -c runtime -r linux-arm64 --self-contained false
+dotnet publish -c Release -r linux-arm64 --self-contained false
+
+
+scp -r ./bin/Release/net8.0/linux-arm/publish/* pi@raspberrypi:/home/pi/smartled/
+```
+
+### Rmote  Debug
+
+Keys: remote、debug、SSH、.Net
+
+[在 ARM 单板计算机上调试 .NET 应用 - .NET | Microsoft Learn](https://learn.microsoft.com/zh-cn/dotnet/iot/debugging?tabs=self-contained&pivots=vscode)
+
+[launch.json](D:\KSS\Software\IoT\Docs\launch.json)
+
+```sh
+pi: sudo vi /etc/ssh/sshd_config (可选，非必要)
 	PermitRootLogin yes
 	PubkeyAuthentication yes
 	AuthorizedKeysFile .ssh/authorized_keys
+	PasswordAuthentication yes
 
-9.再次 ssh-keygen -t rsa -b 4096
+pc: cat ~/.ssh/id_rsa.pub | ssh  pi@raspberrypi 'mkdir -p ~/.ssh && cat >> .ssh/authorized_keys'
 
-10.添加 ssh-key to Github
+pi: curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l ~/vsdbg
 
-11.git clone git@github.com:lianggan13/RaspberryPi.git
-git clone git@github.com:lianggan13/IoT.git
+```
+
+```sh
+ssh -v pi@raspberrypi
+
+ssh-keygen -R raspberrypi
 ```
 
 Keys: Visual Stuido Code
@@ -523,6 +553,13 @@ sudo python setup.py install
 http://www.python-exemplary.com/index_en.php?inhalt_links=navigation_en.inc.php&inhalt_mitte=raspi/en/communication.inc.php
 ```
 
+### I2C
+
+```sh
+sudo apt-get install i2c-tools
+
+```
+
 
 
 ### GPIO
@@ -532,11 +569,46 @@ sudo raspi-gpio get
 
 ```
 
+
+
 ### PiCamera
 
 ```
 sudo apt-get update
 sudo apt-get install python3-picamera
+```
+
+
+
+### CD-ROM
+
+```shell
+# 安装udisks2
+sudo apt install udisks2 dbus
+sudo systemctl enable --now udisks2
+
+# 将当前用户加入 plugdev/storage 组以允许挂载操作
+sudo usermod -aG plugdev,disk $USER
+
+# 立即生效组权限变更（无需重启）
+newgrp plugdev 
+newgrp disk
+
+# 验证组添加成功 
+groups $USER
+
+# 查看所有块设备
+lsblk -f
+
+# 弹出光驱
+sudo eject /dev/sr0
+
+# 挂载设备
+sudo mount /dev/sr0 /mnt/cdrom
+
+x /dev/sr0   /mnt/cdrom   iso9660   ro,user,auto,exec   0   0
+/dev/sr0   /mnt/cdrom   iso9660   ro,user,noauto,exec   0   0
+/dev/sr0   /mnt/cdrom   iso9660   ro,user,nofail,exec   0   0
 ```
 
 

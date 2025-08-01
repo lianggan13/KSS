@@ -1,24 +1,41 @@
 ## Docker
 
-**菜鸟教程 https://www.runoob.com/docker/docker-dockerfile.html**
+### Install
+
+Windows 安装到 D:\
+
+准备: https://blog.csdn.net/cplvfx/article/details/138033592
+
+```markdown
+1.create two folders:
+
+D:\App\Docker
+D:\App\Docker\data
+
+2.Admin Power Shell Command
+
+Start-Process -FilePath "Docker Desktop Installer.exe" -ArgumentList "install", "-accept-license", "--backend=wsl-2", "--installation-dir=D:\App\Docker", "--wsl-default-data-root=D:\App\Docker\data", "--windows-containers-default-data-root=D:\App\Docker" -Wait
+
+3.安装完成后，必须以管理员身份运行 Docker Desktop ，否则 Docker Desktop distro installation failed
+
+"registry-mirrors": [
+	"https://docker.xuanyuan.me",
+	"https://docker.1ms.run",
+	"https://docker-0.unsee.tech",
+	"https://docker-cf.registry.cyou",
+	"https://docker.1panel.live"
+]
+
+4.退出 Docker Desktop，修改文件访问权限
+```
+
+<img src="Images\Docker Install01.jpg" alt="" style="zoom:80%;" />  <img src="Images\Docker Install02.jpg" alt="" style="zoom:80%;" />
+
+### Repositoryc
 
 <img src="Images\docker.png" alt="微服务架构图" style="zoom:80%;" />
 
-<img src="Images\MicroServices.png" alt="微服务架构图" style="zoom:80%;" />
 
-+ 镜像 Image
-+ 容器 container
-+ 仓库 repository
-
-|            | VMware 虚拟机              | Docker 容器              |
-| ---------- | -------------------------- | ------------------------ |
-| 操作系统   | 宿主机OS上运行虚拟机OS     | 与宿主机共享OS           |
-| 存储大小   | 镜像庞大 (vmdk. vdi等）    | 镜像小，便于存储与传输   |
-| 运行性能   | 几乎无额外性能损失         | 几乎无额外性能损失       |
-| 移植性     | 笨重，与虚拟化技术耩合度高 | 轻便、灵活，适应于 Linux |
-| 硬件亲和性 | 面向硬件运维者             | 面向软件开发者           |
-| 部署速度   | 较慢，10s以上              | 快速，秒级               |
-|            |                            |                          |
 
 
 
@@ -88,12 +105,7 @@ ex: docker run -it --privileged=true -v /mydocker/u:/tmp/u --name u1 ubuntu /bin
 
 
 
-### Windows10
 
-```
-阿里云镜像加速器
-"registry-mirrors":["https://jgnv1bqb.mirror.aliyuncs.com"],
-```
 
 ### Ubuntu
 
@@ -529,13 +541,27 @@ COPY- 添加文件，以复制的形式
 ENTRYPOINT- 容器进入时执行的命令
 ```
 
+```dockerfile
+FROM docker.elastic.co/beats/filebeat:8.15.0
+
+USER root
+
+COPY filebeat.yml /usr/share/filebeat/filebeat.yml
+
+RUN chmod go-w /usr/share/filebeat/filebeat.yml
+
+USER filebeat
+
+CMD ["filebeat", "-e", "-c", "/usr/share/filebeat/filebeat.yml"]
+```
+
 
 
 
 
 ### DockerCompose
 
-```c#
+```markdown
 核心概念
 	·一文件
 		docker-compose.yml
@@ -564,6 +590,10 @@ docker-compose config -q # 检查配置，有问题才有输出
 docker-compose restart   # 重启服务
 docker-compose start     # 启动服务
 docker-compose stop      # 停止服务
+    
+# 强制重建容器
+docker-compose down --rmi all --volumes --remove-orphans
+docker-compose up --build
 ```
 
 
@@ -703,9 +733,36 @@ Polly是一种.NET弹性和瞬态故障处理库，允许我们以非常顺畅�
 
 Exceptionless：开源的日志收集和分析框架，能为应用程序提供实时错误、特性和日志报告。
 
+#### ELK
+
 ![](Images\ELK.png)
 
-ELK：最强的分布式日志解决方案
+```markdown
+	ELK 框架是一套开源的日志管理和分析工具，由 Elasticsearch、Logstash 和 Kibana 三个主要组件组成，现在新增了Filebeat组件，可以更高效的收集数据。
+
+    Elasticsearch：分布式、高可扩展的开源搜索引擎，能快速准确地从大量日志数据中检索出所需信息。
+    Logstash：数据收集和处理引擎，用于从各种数据源收集日志数据，如文件、网络接口、数据库等，然后对数据进行过滤、转换和格式化等处理。
+    Kibana：开源的数据分析和可视化平台，可视化方式对 Elasticsearch 中的数据进行分析和展示，无需编写复杂的查询语句，即可快速了解数据的分布、趋势和关联关系。
+    Filebeat ：轻量级的日志文件收集器，专为转发和集中日志数据而设计，用于监控指定的日志文件或目录，一旦有新的日志产生，Filebeat 就会读取并将其发送。
+
+	ELK 框架的工作流程是，Filebeat收集各种来源的日志数据，发送到Logstash处理过滤后将其发送到 Elasticsearch 进行存储和索引，然后 Kibana 从 Elasticsearch 中获取数据并进行可视化展示，为用户提供直观的日志分析结果。
+```
+
+```markdown
+Elasticsearch + Logstash + Kibana +  Filebeat
+		ELKF:https://blog.csdn.net/2301_77760093/article/details/146538429
+		
+		https://www.elastic.co/downloads/elasticsearch
+
+		https://www.elastic.co/cn/downloads/logstash
+		.\bin\logstash.bat  -f  .\config\logstash.conf
+		
+		https://www.elastic.co/cn/downloads/beats/filebeat
+		.\filebeat.exe -c filebeat.yml -e
+
+```
+
+
 
 ### Apollo
 

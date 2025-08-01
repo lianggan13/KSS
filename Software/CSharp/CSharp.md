@@ -665,6 +665,18 @@ private static async void ShowAggregatedException()
 
 ```
 
+### RabbitMQ
+
+MassTransit 分布式消息传递库
+	消息消费者（Consumers）
+	活动（Activities）:Routing Slip 模式的核心组件，用于支持分布式事务和补偿逻辑
+	Saga 状态机（State Machines）管理长时间运行的业务流程，支持事件驱动的状态转换
+	消息发布（Publish）广播机制，用于将消息发送给所有订阅者
+	消息发送（Send）点对点的消息传递机制，用于将消息发送到特定的队列
+	请求客户端（Request Client）实现请求/响应模式
+	管道（Pipelines）定义消息的处理流程
+	错误处理（Error Handling）重试、死信队列
+
 
 
 ### 面试
