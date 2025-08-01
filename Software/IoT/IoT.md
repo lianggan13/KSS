@@ -1,3 +1,14 @@
+## Basic
+
+GPIO
+
+	Push-Pull Output: 工作模式为推挽输出。推挽输出可以在高电平和低电平之间切换，适用于驱动 LED 或其他负载
+	GPIO_PULLUP: 上拉电阻。这意味着在引脚未被驱动时，它会被拉高到高电平。这在处理输入信号时很有用，但在输出模式下可能不是必需的
+
+### AliYun
+
+![](Images\AliYun\阿里云IoT.png)
+
 ## STC90C516
 
 Keil
@@ -11,6 +22,35 @@ Keil
 ## STM32103C8T6
 
 ![](Images\STM32\STM32103C8T6.png)
+
+### STM32CubeMX
+
+```
+RCC 晶振配置 --> 高速晶振
+SYS 下载接口配置 --> SWD (Serial Wire)
+I2C 配置 PB6 PB7 重映射 PB8 PB9
+UART1 异步串口
+UART2 异步串口 开启接收中断
+
+TIM2 定时器
+定时器的时钟频率 = (系统时钟)➗（预分频+1）
+f = (72MHz) ➗ (7199 + 1) = 10kHz
+t = 1/f = 0.1ms = 100us
+Tout = 10 ms = 100us x (arr) ==> arr = 100
+开启定时器中断
+
+GPIO 
+PC13 GPIO_Output
+高电平
+上拉
+
+晶振配置 Clock Configuration
+8M 晶振经过 x9 倍频
+```
+
+
+
+
 
 ### NRF2401L
 
@@ -644,73 +684,122 @@ sudo usermod -aG　dialout pi
 
 [ESP8266 调试教程一（STA模式）（详细图文） - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/164115983)
 
-```
-测试连通性
-AT 
-```
-
 Keys: STA 模式
 
 ```
+波特率 115200 
+自动发送结束符 √
+ESP8266模块在Station（客户端）、AP（服务端）及Station+AP（混合）三种Wi-Fi模式下的配置过程。包括模式切换、连接设置、IP地址分配
+
 查看当前模式
-AT+CWMODE? 
+<< AT+CWMODE?
+>> +CWMODE:1
+1-Station模式
+2-AP模式
+3-AP兼Station模式
+
 设置当前为 STA 模式
-AT+CWMODE=1
+>> AT+CWMODE=1
+
 查看 当前可以查询到的 Wifi 列表
-AT+CWLAP
+>> AT+CWLAP
 连接 Wifi 模式下的参数：WIFI 名称，密码
-AT+CWJAP="LG_ESP","G15608212470*"
+>> AT+CWJAP="LG13_TPLink_2G","G15608212470*"
 
 查看被 分配的 ip
-AT+CIFSR
-
-断开 Wifi
-AT+CWQAP
+>> AT+CIFSR
 
 连接 TCP 服务器
-AT+CIPSTART="TCP","192.168.1.1",8989
+>> AT+CIPSTART="TCP","192.168.0.107",1918
+从TCP服务器下发到 ESP8266 客户端，然后再从串口转发出来，串口调试软件接收显示出来，因此，我们编程的时候只要使用串口接收就好了
 
 使能数据的透传模式
-AT+CIPMODE=1
+>> AT+CIPMODE=1
 
 发送数据
-AT+CIPSEND
+>> AT+CIPSEND
+当接收到 > 号时，就可以进行数据的发送了，一次最大包为2048字节，或者间隔20ms为一包数据
+(串口调试助手上的回车换行 √ 可去掉)
 
-退出数据传输(不能带回车换行符,串口调试助手上的回车换行 √ 去掉)
-+++
+退出数据传输
+>> +++
+不能带回车换行符,串口调试助手上的回车换行 √ 去掉
 
 关闭透传模式
-AT+CIPMODE=0
+>> AT+CIPMODE=0
 
 关闭 TCP 连接
-AT+CIPCLOSE
+>> AT+CIPCLOSE
+
+断开 Wifi
+>> AT+CWQAP
 ```
 
 Keys: AP 模式
 
 ```
 查看当前模式
-AT+CWMODE? 
-设置当前为 AP 模式
-AT+CWMODE=2 
-查看 AP 模式下的参数
-AT+CWSAP? 
-设置 AP 模式下的参数：WIFI 名称，密码，通道号，加密方式，允许接入 Station 个数(0~8)
-AT+CWSAP="LG_ESP","G15608212470*",1,3,4
+>> AT+CWMODE? 
 
-使能多连接模式
-AT+CIPMUX=1
+设置当前为 AP 模式
+>> AT+CWMODE=2 
+
+查看 AP 模式下的参数
+>> AT+CWSAP? 
+
+设置 AP 模式下的参数：WIFI 名称，密码，通道号，加密方式，允许接入 Station 的个数 [0,8]
+>> AT+CWSAP="LG_ESP","G15608212470*",1,3,6
+
+使能多连接模式(需要 关闭透传模式 AT+CIPMODE=0)
+>> AT+CIPMUX=1
+开启多连接模式，因为只有在开启多连接模式的时候才能开启服务器模式。注意：透传只能在单连接模式下进行
+
+设置超时时间
+>> AT+CIPSTO=180
+客户端如果没有数据传输，隔一段时间会自动断开连接，可通过AT+CIPSTO=命令设置超时时间（说明：:服务器超时时间，0~2880，单位为s）
+
 创建 TCP 服务器，默认端口为 333
-AT+CIPSERVER=1
+>> AT+CIPSERVER=1,8080
 
 查看 ESP8266 创建 TCP 服务器时的 IP
-AT+CIPAP?
-向客户端发送数据
-先发送指令：AT+CIPSEND=ID,数据长度
-再发送数据
+>> AT+CIPAP?
+
+向客户端发送数据: 先发送指令：AT+CIPSEND=ID,数据长度,再发送数据
+>> AT+CIPSEND=<ID>,<LEN>
+>> <DATA>
 ```
 
-### NFR24L01 2.4G 无线模块
+
+Keys:  AP兼Station模式
+
+```
+查看当前模式
+>> AT+CWMODE? 
+
+设置 AP 兼 Station 模式
+>> AT+CWMODE=3
+
+查看 AP 模式下的参数
+>> AT+CWSAP? 
+
+设置 AP 模式下的参数：WIFI 名称，密码，通道号，加密方式，允许接入 Station 的个数 [0,8]
+>> AT+CWSAP="LG13_ESP8266","G15608212470*",1,3,6
+
+使能多连接模式(需要 关闭透传模式 AT+CIPMODE=0)
+>> AT+CIPMUX=1
+
+创建 TCP 服务器，默认端口为 333
+>> AT+CIPSERVER=1,8080
+
+查看 ESP8266 创建 TCP 服务器时的 IP
+>> AT+CIPAP?
+
+向客户端发送数据: 先发送指令：AT+CIPSEND=ID,数据长度,再发送数据
+>> AT+CIPSEND=<ID>,<LEN>
+>> <DATA>
+```
+
+### NFR24L01
 
 <img src=".\Images\TPYBoardV102\NRF24L01_01.png" style="zoom:50%;" />
 
@@ -782,11 +871,13 @@ AT+FREQ=2.xxxxG
 AT?
 ```
 
+## Experience
+
+```
+1.中断处理函数中，应避免使用 时钟延时 函数，防止主程序中产生嵌套调用，进而卡死程序执行
+```
 
 
-底层时序图
-
-## 
 
 ## Github
 
