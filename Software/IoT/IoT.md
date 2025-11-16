@@ -58,6 +58,51 @@ PC13 GPIO_Output
 
 ![](Images\STM32\NRF2401L 配置.png)
 
+## ESP32-S3
+
+搭建开发IDE：
+
+[dl.espressif.cn/dl/esp-idf/](https://dl.espressif.cn/dl/esp-idf/)
+
+[使用 VS Code 快速搭建 ESP-IDF 开发环境 (Windows、Linux、MacOS) - 知乎](https://zhuanlan.zhihu.com/p/630698425)
+
+```sh
+# 设置芯片类型
+idf.py set-target esp32s3
+
+idf.py -p COM5 build flash monitor 
+
+idf.py -b 2000000  -p COM10 build flash monitor
+
+编译项目 → 生成.bin固件文件
+烧录固件 → 将固件写入ESP32的Flash存储器
+启动监视器 → 实时显示ESP32的printf输出
+
+#  创建项目
+idf.py create-project hello_world
+
+# 1. 构建项目
+idf.py build
+
+# 2. 烧录到ESP32-S3
+idf.py -p COM10 -b 2000000 flash
+
+# 3. 启动监视器查看输出
+idf.py -p COM10 monitor
+```
+
+```sh
+# 更新组件依赖
+idf.py update-dependencies
+
+# 擦除整个 Flash
+idf.py erase_flash
+```
+
+
+
+
+
 ## Raspberry
 
 ### Start
@@ -66,6 +111,8 @@ Keys: rpi-imager
 
 ```
 https://www.raspberrypi.com/software/
+
+
 ```
 ### Vim
 
