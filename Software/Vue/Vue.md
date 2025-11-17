@@ -1,3 +1,30 @@
+## Install
+
+```shell
+# 查看版本
+node -v
+npm -v
+
+# 删除 node_modules 和 Vite 的缓存目录
+Remove-Item -Recurse -Force .\node_modules
+Remove-Item -Recurse -Force .\node_modules\.vite  # 若存在
+
+# 清理 npm 缓存（出错时）
+npm cache clean --force
+
+# 还原安装依赖
+npm install
+# 如遇 peer deps 错误：
+npm install --legacy-peer-deps
+
+# 重新构建本地二进制模块（需要时）
+npm rebuild
+
+# 启动 dev server（项目通常定义在 package.json）
+npm run dev
+```
+
+
 ## Vue2
 
 ### Yarn

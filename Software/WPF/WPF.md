@@ -3921,6 +3921,14 @@ NavigationContext
 ​	IDialogAware
 ​	IDialogService
 
+
+
+## 3D
+
+[WPF 3D绘图-三维建模技术井眼轨迹图实现（一）-腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/1760865)
+
+
+
 ## Blend
 
 让一控件置于另一控件的 ControlTemplate:	点击 Gird --> 工具 --> 构成控件

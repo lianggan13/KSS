@@ -343,6 +343,35 @@ docker run -d -p 3306:3306 --privileged=true -v /home/zhangliang/Store/Mysql/log
 
 ### Redis
 
+```sh
+# 清空所有数据
+docker exec -it redis redis-cli FLUSHALL
+
+# 同步保存
+docker exec -it redis redis-cli SAVE
+
+# 异步保存
+docker exec -it redis redis-cli BGSAVE
+
+
+```
+
+```sh
+# 连接到Redis
+docker exec -it redis redis-cli
+
+# 查看当前配置
+CONFIG GET save
+
+# 修改配置（临时生效）
+CONFIG SET save "60 100 300 10"
+
+# 保存配置到文件（永久生效）
+CONFIG REWRITE
+```
+
+
+
 ```c#
 docker run -d -p 6379:6379 --privileged=true -v /home/zhangliang/Store/Redis/redis.conf:/etc/redis/redis.conf -v /home/zhangliang/Store/Redis/data:/data --name redis redis:6.0.8 redis-server /etc/redis/redis.conf
 
